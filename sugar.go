@@ -61,6 +61,14 @@ func (l *SugarLogger) Desugar() *Logger {
 	return l.base
 }
 
+func (l *SugarLogger) Named(s string) *SugarLogger {
+	return &SugarLogger{base: l.base.Named(s)}
+}
+
+func (l *SugarLogger) Name() string {
+	return l.base.Name()
+}
+
 // Log logs at the given level. Uses Sprint to format the message.
 func (l *SugarLogger) Log(level slog.Level, args ...any) {
 	l.log(context.Background(), level, "", args)

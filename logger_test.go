@@ -70,10 +70,10 @@ func TestLogger_WithOptions(t *testing.T) {
 	h := slogs.NewHandler(slog.NewJSONHandler(buf, nil))
 	logger := slogs.New(h, slogs.WithCaller(false))
 
-	logger2 := logger.WithOptions(slogs.WithName("test"))
-	logger2.Info("message")
+	logger2 := logger.WithOptions(slogs.WithLevel(slog.LevelWarn))
+	logger2.Warn("message")
 
-	assert.Contains(t, buf.String(), "[test]")
+	assert.Contains(t, buf.String(), "message")
 }
 
 func TestLogger_Handler(t *testing.T) {
@@ -183,4 +183,38 @@ func TestLogger_LogAttrs_Disabled(t *testing.T) {
 
 	logger.LogAttrs(context.Background(), slog.LevelInfo, "should not log", slog.String("k", "v"))
 	assert.Empty(t, buf.String())
+}
+
+func TestLogger_Named(t *testing.T) {
+	buf := &bytes.Buffer{}
+	h := slogs.NewHandler(slog.NewJSONHandler(buf, nil))
+	logger := slogs.New(h).Named("myapp")
+
+	logger.Info("message")
+	assert.Contains(t, buf.String(), "[myapp]")
+}
+
+func TestLogger_Named_Empty(t *testing.T) {
+	buf := &bytes.Buffer{}
+	h := slogs.NewHandler(slog.NewJSONHandler(buf, nil))
+	logger := slogs.New(h).Named("")
+
+	logger.Info("message")
+	assert.NotContains(t, buf.String(), "[]")
+}
+
+func TestLogger_Name(t *testing.T) {
+	buf := &bytes.Buffer{}
+	h := slogs.NewHandler(slog.NewJSONHandler(buf, nil))
+	logger := slogs.New(h).Named("testname")
+
+	assert.Equal(t, "testname", logger.Name())
+}
+
+func TestLogger_Name_Empty(t *testing.T) {
+	buf := &bytes.Buffer{}
+	h := slogs.NewHandler(slog.NewJSONHandler(buf, nil))
+	logger := slogs.New(h)
+
+	assert.Equal(t, "", logger.Name())
 }

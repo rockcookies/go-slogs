@@ -108,10 +108,10 @@ func TestSugarLogger_Handler(t *testing.T) {
 func TestSugarLogger_WithOptions(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := slogs.NewHandler(slog.NewJSONHandler(buf, nil))
-	sugar := slogs.New(h).Sugar().WithOptions(slogs.WithName("test"))
+	sugar := slogs.New(h).Sugar().WithOptions(slogs.WithLevel(slog.LevelWarn))
 
-	sugar.Info("msg")
-	assert.Contains(t, buf.String(), "[test]")
+	sugar.Warn("msg")
+	assert.Contains(t, buf.String(), "msg")
 }
 
 func TestSugarLogger_LogContext(t *testing.T) {
@@ -265,4 +265,38 @@ func TestSugarLogger_Log_Disabled(t *testing.T) {
 
 	sugar.Log(slog.LevelInfo, "should not log")
 	assert.Empty(t, buf.String())
+}
+
+func TestSugarLogger_Named(t *testing.T) {
+	buf := &bytes.Buffer{}
+	h := slogs.NewHandler(slog.NewJSONHandler(buf, nil))
+	sugar := slogs.New(h).Sugar().Named("myapp")
+
+	sugar.Info("message")
+	assert.Contains(t, buf.String(), "[myapp]")
+}
+
+func TestSugarLogger_Named_Empty(t *testing.T) {
+	buf := &bytes.Buffer{}
+	h := slogs.NewHandler(slog.NewJSONHandler(buf, nil))
+	sugar := slogs.New(h).Sugar().Named("")
+
+	sugar.Info("message")
+	assert.NotContains(t, buf.String(), "[]")
+}
+
+func TestSugarLogger_Name(t *testing.T) {
+	buf := &bytes.Buffer{}
+	h := slogs.NewHandler(slog.NewJSONHandler(buf, nil))
+	sugar := slogs.New(h).Sugar().Named("testname")
+
+	assert.Equal(t, "testname", sugar.Name())
+}
+
+func TestSugarLogger_Name_Empty(t *testing.T) {
+	buf := &bytes.Buffer{}
+	h := slogs.NewHandler(slog.NewJSONHandler(buf, nil))
+	sugar := slogs.New(h).Sugar()
+
+	assert.Equal(t, "", sugar.Name())
 }

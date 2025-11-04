@@ -193,6 +193,16 @@ func (l *Logger) Sugar() *SugarLogger {
 	return &SugarLogger{base: l}
 }
 
+func (l *Logger) Named(s string) *Logger {
+	l2 := l.clone()
+	l2.handler = l2.handler.Named(s)
+	return l2
+}
+
+func (l *Logger) Name() string {
+	return l.handler.Name()
+}
+
 // Log emits a log record with the current time and the given level and message.
 //
 // The Record's attributes consist of the Logger's attributes followed by

@@ -4,7 +4,6 @@ import (
 	"context"
 	"log/slog"
 	"slices"
-	"strings"
 	"time"
 )
 
@@ -39,7 +38,7 @@ type HandlerOptions struct {
 type Handler struct {
 	next    slog.Handler
 	handle  HandleFunc
-	level   *slog.Level
+	level   slog.Leveler
 	context *HandlerContext
 }
 
@@ -48,9 +47,7 @@ type Handler struct {
 // It maintains the chain of logger names and the linked list of attribute groups
 // that will be applied to log records.
 type HandlerContext struct {
-	// Names is the chain of logger names, used to prefix log messages.
-	// For example: ["service", "database"] becomes "[service.database]"
-	Names []string
+	Name string
 
 	// Attrs is the linked list of attribute groups.
 	// Newest groups are at the head, forming a chain to the oldest.
@@ -134,7 +131,8 @@ func NewHandlerWithOptions(next slog.Handler, opts *HandlerOptions) *Handler {
 // handler and the next handler would handle it.
 func (h *Handler) Enabled(ctx context.Context, level slog.Level) bool {
 	if h.level != nil {
-		if *h.level < level {
+		// If the incoming level is less than the configured minimum level, disable it
+		if level < h.level.Level() {
 			return false
 		}
 	}
@@ -179,8 +177,6 @@ func (h *Handler) Handle(ctx context.Context, r slog.Record) error {
 func (h *Handler) Clone() *Handler {
 	h2 := *h
 	hc2 := *h.context
-	// Deep copy Names slice to avoid race conditions
-	hc2.Names = slices.Clone(h.context.Names)
 	h2.context = &hc2
 	return &h2
 }
@@ -216,10 +212,20 @@ func (h *Handler) WithAttrs(attrs []slog.Attr) slog.Handler {
 //
 // Records below this level will be discarded before reaching the next handler.
 // This is useful for creating loggers with different verbosity levels.
-func (h *Handler) WithLevel(level slog.Level) *Handler {
+func (h *Handler) WithLevel(level slog.Leveler) *Handler {
 	h2 := h.Clone()
-	h2.level = &level
+	h2.level = level
 	return h2
+}
+
+func (h *Handler) Named(name string) *Handler {
+	h2 := h.Clone()
+	h2.context.Name = name
+	return h2
+}
+
+func (h *Handler) Name() string {
+	return h.context.Name
 }
 
 // DefaultHandleFunc is the default handler function used when no custom HandleFunc is provided.
@@ -255,8 +261,8 @@ func DefaultHandleFunc(ctx context.Context, hc *HandlerContext, rt time.Time, rl
 	prepended := ExtractPrepended(ctx)
 	attrs = append(prepended, attrs...)
 
-	if len(hc.Names) > 0 {
-		rm = "[" + strings.Join(hc.Names, ".") + "] " + rm
+	if hc.Name != "" {
+		rm = "[" + hc.Name + "] " + rm
 	}
 
 	return rm, attrs
