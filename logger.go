@@ -22,12 +22,22 @@ type Logger struct {
 }
 
 // New creates a new Logger with the given non-nil Handler.
-func New(h *Handler) *Logger {
+func New(h *Handler, options ...Option) *Logger {
 	if h == nil {
 		panic("nil Handler")
 	}
 
-	return &Logger{handler: h}
+	l := &Logger{
+		handler:    h,
+		addCaller:  true,
+		callerSkip: 0,
+	}
+
+	for _, opt := range options {
+		opt.apply(l)
+	}
+
+	return l
 }
 
 // clone creates a shallow copy of l.
