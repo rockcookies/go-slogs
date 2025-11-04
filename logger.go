@@ -193,12 +193,14 @@ func (l *Logger) Sugar() *SugarLogger {
 	return &SugarLogger{base: l}
 }
 
+// Named returns a new Logger with the given name added to the logger's name chain.
 func (l *Logger) Named(s string) *Logger {
 	l2 := l.clone()
 	l2.handler = l2.handler.Named(s)
 	return l2
 }
 
+// Name returns the logger's name.
 func (l *Logger) Name() string {
 	return l.handler.Name()
 }
@@ -277,6 +279,7 @@ func (l *Logger) ErrorContext(ctx context.Context, msg string, args ...any) {
 	l.log(ctx, slog.LevelError, msg, args...)
 }
 
+// capturePC captures the program counter of the calling code for caller information.
 func (l *Logger) capturePC() uintptr {
 	var pc uintptr
 	if l.addCaller {
@@ -288,7 +291,7 @@ func (l *Logger) capturePC() uintptr {
 	return pc
 }
 
-// log is the internal logging method.
+// log is the internal logging method that handles argument conversion and record creation.
 func (l *Logger) log(ctx context.Context, level slog.Level, msg string, args ...any) {
 	if ctx == nil {
 		ctx = context.Background()
@@ -305,7 +308,7 @@ func (l *Logger) log(ctx context.Context, level slog.Level, msg string, args ...
 	_ = l.handler.Handle(ctx, r)
 }
 
-// logAttrs is the internal logging method that accepts only Attrs.
+// logAttrs is the internal logging method that accepts pre-converted slog.Attr values.
 func (l *Logger) logAttrs(ctx context.Context, level slog.Level, msg string, attrs ...slog.Attr) {
 	if ctx == nil {
 		ctx = context.Background()

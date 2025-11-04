@@ -181,6 +181,7 @@ func (h *Handler) Clone() *Handler {
 	return &h2
 }
 
+// withGroup returns a new Handler with the given group name added to the attribute chain.
 func (h *Handler) withGroup(name string) *Handler {
 	h2 := h.Clone()
 	h2.context.Attrs = h.context.Attrs.WithGroup(name)
@@ -195,6 +196,7 @@ func (h *Handler) WithGroup(name string) slog.Handler {
 	return h.withGroup(name)
 }
 
+// withAttrs returns a new Handler with the given attributes added to the attribute chain.
 func (h *Handler) withAttrs(attrs []slog.Attr) *Handler {
 	h2 := h.Clone()
 	h2.context.Attrs = h.context.Attrs.WithAttrs(attrs)
@@ -218,12 +220,14 @@ func (h *Handler) WithLevel(level slog.Leveler) *Handler {
 	return h2
 }
 
+// Named returns a new Handler with the given name set as the logger's name.
 func (h *Handler) Named(name string) *Handler {
 	h2 := h.Clone()
 	h2.context.Name = name
 	return h2
 }
 
+// Name returns the handler's name.
 func (h *Handler) Name() string {
 	return h.context.Name
 }

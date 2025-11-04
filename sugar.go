@@ -61,10 +61,12 @@ func (l *SugarLogger) Desugar() *Logger {
 	return l.base
 }
 
+// Named returns a new SugarLogger with the given name added to the logger's name chain.
 func (l *SugarLogger) Named(s string) *SugarLogger {
 	return &SugarLogger{base: l.base.Named(s)}
 }
 
+// Name returns the logger's name.
 func (l *SugarLogger) Name() string {
 	return l.base.Name()
 }
