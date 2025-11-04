@@ -21,29 +21,6 @@ A powerful Go structured logging library built on top of the standard library `l
 go get github.com/rockcookies/go-slogs
 ```
 
-# go-slogs
-
-[![Go Version](https://img.shields.io/badge/go-1.21+-blue.svg)](https://go.dev/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-
-A powerful Go structured logging library built on top of the standard library `log/slog`, providing enhanced logging capabilities and flexible middleware support.
-
-## Features
-
-- 🚀 **Fully Compatible with `log/slog`**: Built on Go's standard library for seamless integration
-- 🎯 **Middleware Architecture**: Support for Handler middleware, easy to extend
-- 📝 **Sugar Logger**: Provides Zap-like Sugar API with formatting support
-- 🏷️ **Named Loggers**: Set logger names for easy identification of log sources
-- 📦 **Context Attributes**: Extract and add log attributes from Context
-- ⚙️ **Flexible Configuration**: Rich configuration options including log levels, caller info, etc.
-- 🎨 **Attribute Grouping**: Group attributes for better log structure organization
-
-## Installation
-
-```bash
-go get github.com/rockcookies/go-slogs
-```
-
 ## Quick Start
 
 ### Basic Usage
@@ -208,6 +185,8 @@ func main() {
 - `WithGroup(name string) *Logger` - Create attribute group
 - `WithOptions(opts ...Option) *Logger` - Apply options
 - `Sugar() *SugarLogger` - Convert to Sugar Logger
+- `Named(name string) *Logger` - Create a named logger (adds to name chain)
+- `Name() string` - Get the logger's name
 
 **Logging Methods:**
 - `Debug(msg string, args ...any)`
@@ -225,7 +204,10 @@ func main() {
 
 - `With(args ...any) *SugarLogger` - Add attributes
 - `WithGroup(name string) *SugarLogger` - Create attribute group
+- `WithOptions(opts ...Option) *SugarLogger` - Apply options
 - `Desugar() *Logger` - Convert back to standard Logger
+- `Named(name string) *SugarLogger` - Create a named sugar logger (adds to name chain)
+- `Name() string` - Get the sugar logger's name
 
 **Logging Methods:**
 - `Debug(args ...any)` / `Debugf(template string, args ...any)`
@@ -301,6 +283,12 @@ Run tests:
 
 ```bash
 go test -v ./...
+```
+
+Run tests with race detection (recommended):
+
+```bash
+go test -race -v ./...
 ```
 
 Run tests with coverage:
