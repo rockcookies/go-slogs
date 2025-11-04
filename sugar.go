@@ -147,5 +147,7 @@ func getMessage(template string, fmtArgs []any) string {
 			return str
 		}
 	}
-	return fmt.Sprint(fmtArgs...)
+	// Use Sprintln and trim trailing newline for consistent spacing
+	msg := fmt.Sprintln(fmtArgs...)
+	return msg[:len(msg)-1]
 }

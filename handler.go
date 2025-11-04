@@ -117,6 +117,8 @@ func (h *Handler) Handle(ctx context.Context, r slog.Record) error {
 func (h *Handler) Clone() *Handler {
 	h2 := *h
 	hc2 := *h.context
+	// Deep copy Names slice to avoid race conditions
+	hc2.Names = slices.Clone(h.context.Names)
 	h2.context = &hc2
 	return &h2
 }

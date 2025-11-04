@@ -36,6 +36,8 @@ func WithName(name string) Option {
 			return
 		}
 
+		// Clone handler to avoid modifying shared state
+		l.handler = l.handler.Clone()
 		l.handler.context.Names = append(l.handler.context.Names, name)
 	})
 }
@@ -46,6 +48,8 @@ func WithNameOverride(name string) Option {
 			return
 		}
 
+		// Clone handler to avoid modifying shared state
+		l.handler = l.handler.Clone()
 		l.handler.context.Names = []string{name}
 	})
 }
