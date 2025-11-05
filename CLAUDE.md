@@ -383,8 +383,29 @@ go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 ├── logger.go          # Main Logger implementation
 ├── option.go          # Configuration options
 ├── sugar.go           # Sugar API implementation
+├── redirect.go        # Standard library log redirection
 ├── internal/
 │   └── attr/
 │       └── attr.go    # Argument conversion utilities
 └── *_test.go          # Comprehensive test suite
 ```
+
+## Additional Features
+
+### Standard Library Log Redirection
+
+The library provides `RedirectStdLogAt` function to redirect the standard library's global logger to slogs with specific level handling:
+
+```go
+// Redirect standard lib log to slogs at Info level
+restore, err := slogs.RedirectStdLogAt(logger, slog.LevelInfo)
+if err != nil {
+    log.Fatal(err)
+}
+defer restore() // Restore original logger
+
+// Standard library log calls now go through slogs
+log.Print("This will be handled by slogs")
+```
+
+This feature automatically handles caller information and disables the standard library's annotations to avoid duplication.
