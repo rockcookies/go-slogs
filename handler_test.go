@@ -1,4 +1,4 @@
-package slogs_test
+package slogs
 
 import (
 	"bytes"
@@ -7,19 +7,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rockcookies/go-slogs"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewHandler(t *testing.T) {
 	buf := &bytes.Buffer{}
-	h := slogs.NewHandler(slog.NewJSONHandler(buf, nil))
+	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	assert.NotNil(t, h)
 }
 
 func TestHandler_WithAttrs(t *testing.T) {
 	buf := &bytes.Buffer{}
-	h := slogs.NewHandler(slog.NewJSONHandler(buf, nil))
+	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	h2 := h.WithAttrs([]slog.Attr{slog.String("key", "value")})
 
 	r := slog.NewRecord(time.Time{}, slog.LevelInfo, "test", 0)
@@ -31,7 +30,7 @@ func TestHandler_WithAttrs(t *testing.T) {
 
 func TestHandler_WithGroup(t *testing.T) {
 	buf := &bytes.Buffer{}
-	h := slogs.NewHandler(slog.NewJSONHandler(buf, nil))
+	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	h2 := h.WithGroup("grp")
 
 	r := slog.NewRecord(time.Time{}, slog.LevelInfo, "test", 0)
@@ -44,7 +43,7 @@ func TestHandler_WithGroup(t *testing.T) {
 func TestHandler_Enabled(t *testing.T) {
 	buf := &bytes.Buffer{}
 	base := slog.NewJSONHandler(buf, &slog.HandlerOptions{Level: slog.LevelWarn})
-	h := slogs.NewHandler(base)
+	h := NewHandler(base)
 
 	assert.True(t, h.Enabled(context.Background(), slog.LevelWarn))
 	assert.False(t, h.Enabled(context.Background(), slog.LevelDebug))
@@ -52,7 +51,7 @@ func TestHandler_Enabled(t *testing.T) {
 
 func TestHandler_WithLevel(t *testing.T) {
 	buf := &bytes.Buffer{}
-	h := slogs.NewHandler(slog.NewJSONHandler(buf, nil))
+	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	h2 := h.WithLevel(slog.LevelError)
 
 	// When handler level is Error, only Error level should be enabled
@@ -63,7 +62,7 @@ func TestHandler_WithLevel(t *testing.T) {
 
 func TestNewMiddleware(t *testing.T) {
 	buf := &bytes.Buffer{}
-	middleware := slogs.NewMiddleware(nil)
+	middleware := NewMiddleware(nil)
 	handler := middleware(slog.NewJSONHandler(buf, nil))
 
 	assert.NotNil(t, handler)
@@ -71,14 +70,14 @@ func TestNewMiddleware(t *testing.T) {
 
 func TestNewHandler_NilPanic(t *testing.T) {
 	assert.Panics(t, func() {
-		slogs.NewHandler(nil)
+		NewHandler(nil)
 	})
 }
 
 func TestHandler_Named(t *testing.T) {
 	buf := &bytes.Buffer{}
 	base := slog.NewJSONHandler(buf, nil)
-	h := slogs.NewHandler(base)
+	h := NewHandler(base)
 	h2 := h.Named("myapp")
 
 	r := slog.NewRecord(time.Time{}, slog.LevelInfo, "test", 0)
@@ -90,7 +89,7 @@ func TestHandler_Named(t *testing.T) {
 func TestHandler_Named_Empty(t *testing.T) {
 	buf := &bytes.Buffer{}
 	base := slog.NewJSONHandler(buf, nil)
-	h := slogs.NewHandler(base)
+	h := NewHandler(base)
 	h2 := h.Named("")
 
 	r := slog.NewRecord(time.Time{}, slog.LevelInfo, "test", 0)
@@ -102,7 +101,7 @@ func TestHandler_Named_Empty(t *testing.T) {
 func TestHandler_Name(t *testing.T) {
 	buf := &bytes.Buffer{}
 	base := slog.NewJSONHandler(buf, nil)
-	h := slogs.NewHandler(base)
+	h := NewHandler(base)
 	h2 := h.Named("testname")
 
 	assert.Equal(t, "testname", h2.Name())
@@ -111,7 +110,7 @@ func TestHandler_Name(t *testing.T) {
 func TestHandler_Name_Empty(t *testing.T) {
 	buf := &bytes.Buffer{}
 	base := slog.NewJSONHandler(buf, nil)
-	h := slogs.NewHandler(base)
+	h := NewHandler(base)
 
 	assert.Equal(t, "", h.Name())
 }
@@ -120,7 +119,7 @@ func TestHandler_WithLevel_Leveler(t *testing.T) {
 	buf := &bytes.Buffer{}
 	// Use LevelDebug for base handler so it doesn't filter anything
 	base := slog.NewJSONHandler(buf, &slog.HandlerOptions{Level: slog.LevelDebug})
-	h := slogs.NewHandler(base)
+	h := NewHandler(base)
 	h2 := h.WithLevel(slog.LevelWarn)
 
 	// When handler level is Warn, levels below Warn should be disabled

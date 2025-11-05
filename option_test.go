@@ -1,18 +1,17 @@
-package slogs_test
+package slogs
 
 import (
 	"bytes"
 	"log/slog"
 	"testing"
 
-	"github.com/rockcookies/go-slogs"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestWithCaller(t *testing.T) {
 	buf := &bytes.Buffer{}
-	h := slogs.NewHandler(slog.NewJSONHandler(buf, nil))
-	logger := slogs.New(h, slogs.WithCaller(true))
+	h := NewHandler(slog.NewJSONHandler(buf, nil))
+	logger := New(h, WithCaller(true))
 
 	logger.Info("test")
 	assert.NotEmpty(t, buf.String())
@@ -20,8 +19,8 @@ func TestWithCaller(t *testing.T) {
 
 func TestWithCallerSkip(t *testing.T) {
 	buf := &bytes.Buffer{}
-	h := slogs.NewHandler(slog.NewJSONHandler(buf, nil))
-	logger := slogs.New(h, slogs.WithCallerSkip(1))
+	h := NewHandler(slog.NewJSONHandler(buf, nil))
+	logger := New(h, WithCallerSkip(1))
 
 	logger.Info("test")
 	assert.NotEmpty(t, buf.String())
@@ -29,8 +28,8 @@ func TestWithCallerSkip(t *testing.T) {
 
 func TestWithLevel(t *testing.T) {
 	buf := &bytes.Buffer{}
-	h := slogs.NewHandler(slog.NewJSONHandler(buf, &slog.HandlerOptions{Level: slog.LevelDebug}))
-	logger := slogs.New(h, slogs.WithLevel(slog.LevelWarn))
+	h := NewHandler(slog.NewJSONHandler(buf, &slog.HandlerOptions{Level: slog.LevelDebug}))
+	logger := New(h, WithLevel(slog.LevelWarn))
 
 	logger.Info("should not appear")
 	buf.Reset()

@@ -1,4 +1,4 @@
-package slogs_test
+package slogs
 
 import (
 	"bytes"
@@ -6,13 +6,12 @@ import (
 	"log/slog"
 	"testing"
 
-	"github.com/rockcookies/go-slogs"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestPrepend(t *testing.T) {
-	ctx := slogs.Prepend(context.Background(), "key1", "val1")
-	attrs := slogs.ExtractPrepended(ctx)
+	ctx := Prepend(context.Background(), "key1", "val1")
+	attrs := ExtractPrepended(ctx)
 
 	assert.Len(t, attrs, 1)
 	assert.Equal(t, "key1", attrs[0].Key)
@@ -20,8 +19,8 @@ func TestPrepend(t *testing.T) {
 }
 
 func TestAppend(t *testing.T) {
-	ctx := slogs.Append(context.Background(), "key2", "val2")
-	attrs := slogs.ExtractAppended(ctx)
+	ctx := Append(context.Background(), "key2", "val2")
+	attrs := ExtractAppended(ctx)
 
 	assert.Len(t, attrs, 1)
 	assert.Equal(t, "key2", attrs[0].Key)
@@ -29,20 +28,20 @@ func TestAppend(t *testing.T) {
 }
 
 func TestPrepend_Multiple(t *testing.T) {
-	ctx := slogs.Prepend(context.Background(), "k1", "v1")
-	ctx = slogs.Prepend(ctx, "k2", "v2")
-	attrs := slogs.ExtractPrepended(ctx)
+	ctx := Prepend(context.Background(), "k1", "v1")
+	ctx = Prepend(ctx, "k2", "v2")
+	attrs := ExtractPrepended(ctx)
 
 	assert.Len(t, attrs, 2)
 }
 
 func TestContextAttrs_Integration(t *testing.T) {
 	buf := &bytes.Buffer{}
-	h := slogs.NewHandler(slog.NewJSONHandler(buf, nil))
-	logger := slogs.New(h)
+	h := NewHandler(slog.NewJSONHandler(buf, nil))
+	logger := New(h)
 
-	ctx := slogs.Prepend(context.Background(), "pre", "first")
-	ctx = slogs.Append(ctx, "app", "last")
+	ctx := Prepend(context.Background(), "pre", "first")
+	ctx = Append(ctx, "app", "last")
 
 	logger.InfoContext(ctx, "message", "mid", "value")
 	output := buf.String()
@@ -53,33 +52,33 @@ func TestContextAttrs_Integration(t *testing.T) {
 }
 
 func TestExtract_Nil(t *testing.T) {
-	attrs := slogs.ExtractPrepended(context.Background())
+	attrs := ExtractPrepended(context.Background())
 	assert.Nil(t, attrs)
 
-	attrs = slogs.ExtractAppended(context.Background())
+	attrs = ExtractAppended(context.Background())
 	assert.Nil(t, attrs)
 }
 
 func TestPrepend_NilContext(t *testing.T) {
-	ctx := slogs.Prepend(nil, "key", "value")
-	attrs := slogs.ExtractPrepended(ctx)
+	ctx := Prepend(nil, "key", "value")
+	attrs := ExtractPrepended(ctx)
 
 	assert.Len(t, attrs, 1)
 	assert.Equal(t, "key", attrs[0].Key)
 }
 
 func TestAppend_NilContext(t *testing.T) {
-	ctx := slogs.Append(nil, "key", "value")
-	attrs := slogs.ExtractAppended(ctx)
+	ctx := Append(nil, "key", "value")
+	attrs := ExtractAppended(ctx)
 
 	assert.Len(t, attrs, 1)
 	assert.Equal(t, "key", attrs[0].Key)
 }
 
 func TestAppend_Multiple(t *testing.T) {
-	ctx := slogs.Append(context.Background(), "k1", "v1")
-	ctx = slogs.Append(ctx, "k2", "v2")
-	attrs := slogs.ExtractAppended(ctx)
+	ctx := Append(context.Background(), "k1", "v1")
+	ctx = Append(ctx, "k2", "v2")
+	attrs := ExtractAppended(ctx)
 
 	assert.Len(t, attrs, 2)
 }
