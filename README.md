@@ -12,6 +12,7 @@ Enhanced structured logging for Go built on `log/slog` with middleware support, 
 - **Sugar API**: Zap-like formatted logging methods
 - **Named Loggers**: Hierarchical logger naming for better organization
 - **Context Attributes**: Automatic attribute propagation via Go contexts
+- **Stack Trace Support**: Built-in stack trace attribute creation
 - **Standard Log Redirect**: Redirect `log` package output to structured logging
 
 ## Installation
@@ -50,6 +51,9 @@ func main() {
     // Context attributes
     ctx := slogs.Prepend(context.Background(), "request_id", "123")
     logger.InfoContext(ctx, "Request processed")
+
+    // Stack trace for debugging
+    logger.Error("Something went wrong", slogs.Stack("stack"))
 }
 ```
 
@@ -175,6 +179,10 @@ logger.Info("message", "key", "value")
 - `Append(ctx, args...) context.Context`
 - `RedirectStdLogAt(logger, level) (func(), error)`
 
+### Stack Trace Functions
+- `Stack(key string) slog.Attr`
+- `StackSkip(key string, skip int) slog.Attr`
+
 For detailed API documentation, see [GoDoc](https://pkg.go.dev/github.com/rockcookies/go-slogs).
 
 ## Comparison with log/slog
@@ -186,6 +194,7 @@ For detailed API documentation, see [GoDoc](https://pkg.go.dev/github.com/rockco
 | Sugar API | ❌ | ✅ |
 | Named Loggers | ❌ | ✅ |
 | Context Attributes | ❌ | ✅ |
+| Stack Trace Support | ❌ | ✅ |
 | Log Redirection | ❌ | ✅ |
 
 ## Best Practices

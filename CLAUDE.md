@@ -105,6 +105,16 @@ codecov -f coverage.out
    - Log level management
    - Named logger configuration
 
+7. **Stack Trace System (`attr.go`, `internal/stacktrace/`)** - Stack capture and formatting
+   - `Stack()` and `StackSkip()` functions for creating stack trace attributes
+   - Efficient stack trace capture with pooling
+   - Formatted stack trace output similar to zap
+
+8. **Buffer Pool System (`buffer/`, `internal/pool/`)** - High-performance buffer management
+   - Generic type-safe pool implementation
+   - Reduces memory allocations for string operations
+   - Used internally by stack trace formatting
+
 ### Key Design Patterns
 
 - **Middleware Pattern**: Handler wraps another handler for processing pipelines
@@ -194,6 +204,8 @@ The `DefaultHandleFunc` processes attributes in this order:
 - **Attribute slices**: Create new slices during processing (immutable pattern)
 - **Handler cloning**: Deep copy mutable state when deriving handlers
 - **Sugar formatting**: May allocate for `Sprintf` operations
+- **Buffer pooling**: Reduces allocations for string operations via buffer reuse
+- **Stack trace capture**: Uses pooling to minimize allocation overhead
 
 ### Best Practices
 
@@ -377,16 +389,26 @@ go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
 ```
 .
+├── attr.go            # Stack trace attribute functions
 ├── attrs.go           # Attribute grouping linked list
 ├── context.go         # Context attribute management
 ├── handler.go         # Middleware handler implementation
 ├── logger.go          # Main Logger implementation
 ├── option.go          # Configuration options
-├── sugar.go           # Sugar API implementation
 ├── redirect.go        # Standard library log redirection
+├── sugar.go           # Sugar API implementation
+├── buffer/            # Buffer pool implementation
+│   ├── buffer.go
+│   └── pool.go
 ├── internal/
-│   └── attr/
-│       └── attr.go    # Argument conversion utilities
+│   ├── attr/
+│   │   └── attr.go    # Argument conversion utilities
+│   ├── bufferpool/
+│   │   └── bufferpool.go # Internal buffer pool
+│   ├── pool/
+│   │   └── pool.go    # Generic pool implementation
+│   └── stacktrace/
+│       └── stack.go   # Stack trace capture and formatting
 └── *_test.go          # Comprehensive test suite
 ```
 
@@ -409,3 +431,17 @@ log.Print("This will be handled by slogs")
 ```
 
 This feature automatically handles caller information and disables the standard library's annotations to avoid duplication.
+
+### Stack Trace Attributes
+
+The library provides stack trace attribute creation for debugging:
+
+```go
+// Add stack trace to log entries
+logger.Error("Database connection failed", slogs.Stack("stack"))
+
+// Skip frames when capturing stack trace
+logger.Error("Handler error", slogs.StackSkip("stack", 2)) // skip 2 frames
+```
+
+Stack trace capture is optimized with pooling to minimize performance impact.
