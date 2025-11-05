@@ -85,7 +85,7 @@ codecov -f coverage.out
    - Supports custom processing via `HandleFunc`
    - Designed to work with handler pipelines (e.g., slog-multi)
 
-3. **SugarLogger (`sugar.go`)** - Zap-like Sugar API for convenient logging
+3. **SugaredLogger (`sugar.go`)** - Zap-like Sugar API for convenient logging
    - Provides both Sprint-style and Sprintf-style methods
    - Wraps the main Logger for backward compatibility
    - Offers `Desugar()` method to convert back to regular Logger
@@ -109,7 +109,7 @@ codecov -f coverage.out
 
 - **Middleware Pattern**: Handler wraps another handler for processing pipelines
 - **Linked List**: Attribute groups use linked list for efficient composition
-- **Interface Segregation**: Separate Logger and SugarLogger interfaces
+- **Interface Segregation**: Separate Logger and SugaredLogger interfaces
 - **Context Propagation**: Uses Go context for automatic attribute inclusion
 
 ### Handler Flow

@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSugarLogger_Basic(t *testing.T) {
+func TestSugaredLogger_Basic(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar()
@@ -18,7 +18,7 @@ func TestSugarLogger_Basic(t *testing.T) {
 	assert.Contains(t, buf.String(), "test message")
 }
 
-func TestSugarLogger_Formatted(t *testing.T) {
+func TestSugaredLogger_Formatted(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar()
@@ -27,7 +27,7 @@ func TestSugarLogger_Formatted(t *testing.T) {
 	assert.Contains(t, buf.String(), "formatted message")
 }
 
-func TestSugarLogger_Levels(t *testing.T) {
+func TestSugaredLogger_Levels(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	sugar := New(h).Sugar()
@@ -44,7 +44,7 @@ func TestSugarLogger_Levels(t *testing.T) {
 	assert.Contains(t, output, "error")
 }
 
-func TestSugarLogger_WithContext(t *testing.T) {
+func TestSugaredLogger_WithContext(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar()
@@ -54,7 +54,7 @@ func TestSugarLogger_WithContext(t *testing.T) {
 	assert.Contains(t, buf.String(), "context message")
 }
 
-func TestSugarLogger_With(t *testing.T) {
+func TestSugaredLogger_With(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar().With("key", "value")
@@ -64,7 +64,7 @@ func TestSugarLogger_With(t *testing.T) {
 	assert.Contains(t, buf.String(), "value")
 }
 
-func TestSugarLogger_WithGroup(t *testing.T) {
+func TestSugaredLogger_WithGroup(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar().WithGroup("group")
@@ -75,7 +75,7 @@ func TestSugarLogger_WithGroup(t *testing.T) {
 	assert.Contains(t, output, "test")
 }
 
-func TestSugarLogger_Desugar(t *testing.T) {
+func TestSugaredLogger_Desugar(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar()
@@ -87,7 +87,7 @@ func TestSugarLogger_Desugar(t *testing.T) {
 	assert.Contains(t, buf.String(), "from desugar")
 }
 
-func TestSugarLogger_LogLevel(t *testing.T) {
+func TestSugaredLogger_LogLevel(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar()
@@ -96,7 +96,7 @@ func TestSugarLogger_LogLevel(t *testing.T) {
 	assert.Contains(t, buf.String(), "custom level")
 }
 
-func TestSugarLogger_Handler(t *testing.T) {
+func TestSugaredLogger_Handler(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar()
@@ -104,7 +104,7 @@ func TestSugarLogger_Handler(t *testing.T) {
 	assert.NotNil(t, sugar.Handler())
 }
 
-func TestSugarLogger_WithOptions(t *testing.T) {
+func TestSugaredLogger_WithOptions(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar().WithOptions(WithLevel(slog.LevelWarn))
@@ -113,7 +113,7 @@ func TestSugarLogger_WithOptions(t *testing.T) {
 	assert.Contains(t, buf.String(), "msg")
 }
 
-func TestSugarLogger_LogContext(t *testing.T) {
+func TestSugaredLogger_LogContext(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar()
@@ -123,7 +123,7 @@ func TestSugarLogger_LogContext(t *testing.T) {
 	assert.Contains(t, buf.String(), "ctx msg")
 }
 
-func TestSugarLogger_DebugContext(t *testing.T) {
+func TestSugaredLogger_DebugContext(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	sugar := New(h).Sugar()
@@ -133,7 +133,7 @@ func TestSugarLogger_DebugContext(t *testing.T) {
 	assert.Contains(t, buf.String(), "debug ctx")
 }
 
-func TestSugarLogger_WarnContext(t *testing.T) {
+func TestSugaredLogger_WarnContext(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar()
@@ -143,7 +143,7 @@ func TestSugarLogger_WarnContext(t *testing.T) {
 	assert.Contains(t, buf.String(), "warn ctx")
 }
 
-func TestSugarLogger_ErrorContext(t *testing.T) {
+func TestSugaredLogger_ErrorContext(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar()
@@ -153,7 +153,7 @@ func TestSugarLogger_ErrorContext(t *testing.T) {
 	assert.Contains(t, buf.String(), "error ctx")
 }
 
-func TestSugarLogger_Logf(t *testing.T) {
+func TestSugaredLogger_Logf(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar()
@@ -162,7 +162,7 @@ func TestSugarLogger_Logf(t *testing.T) {
 	assert.Contains(t, buf.String(), "formatted message")
 }
 
-func TestSugarLogger_LogfContext(t *testing.T) {
+func TestSugaredLogger_LogfContext(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar()
@@ -172,7 +172,7 @@ func TestSugarLogger_LogfContext(t *testing.T) {
 	assert.Contains(t, buf.String(), "ctx formatted")
 }
 
-func TestSugarLogger_Debugf(t *testing.T) {
+func TestSugaredLogger_Debugf(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	sugar := New(h).Sugar()
@@ -181,7 +181,7 @@ func TestSugarLogger_Debugf(t *testing.T) {
 	assert.Contains(t, buf.String(), "debug 123")
 }
 
-func TestSugarLogger_DebugfContext(t *testing.T) {
+func TestSugaredLogger_DebugfContext(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	sugar := New(h).Sugar()
@@ -191,7 +191,7 @@ func TestSugarLogger_DebugfContext(t *testing.T) {
 	assert.Contains(t, buf.String(), "debug ctx msg")
 }
 
-func TestSugarLogger_InfofContext(t *testing.T) {
+func TestSugaredLogger_InfofContext(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar()
@@ -201,7 +201,7 @@ func TestSugarLogger_InfofContext(t *testing.T) {
 	assert.Contains(t, buf.String(), "info ctx msg")
 }
 
-func TestSugarLogger_Warnf(t *testing.T) {
+func TestSugaredLogger_Warnf(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar()
@@ -210,7 +210,7 @@ func TestSugarLogger_Warnf(t *testing.T) {
 	assert.Contains(t, buf.String(), "warn message")
 }
 
-func TestSugarLogger_WarnfContext(t *testing.T) {
+func TestSugaredLogger_WarnfContext(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar()
@@ -220,7 +220,7 @@ func TestSugarLogger_WarnfContext(t *testing.T) {
 	assert.Contains(t, buf.String(), "warn ctx msg")
 }
 
-func TestSugarLogger_Errorf(t *testing.T) {
+func TestSugaredLogger_Errorf(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar()
@@ -229,7 +229,7 @@ func TestSugarLogger_Errorf(t *testing.T) {
 	assert.Contains(t, buf.String(), "error 500")
 }
 
-func TestSugarLogger_ErrorfContext(t *testing.T) {
+func TestSugaredLogger_ErrorfContext(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar()
@@ -239,7 +239,7 @@ func TestSugarLogger_ErrorfContext(t *testing.T) {
 	assert.Contains(t, buf.String(), "error ctx msg")
 }
 
-func TestSugarLogger_GetMessage_NoArgs(t *testing.T) {
+func TestSugaredLogger_GetMessage_NoArgs(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar()
@@ -248,7 +248,7 @@ func TestSugarLogger_GetMessage_NoArgs(t *testing.T) {
 	assert.NotEmpty(t, buf.String())
 }
 
-func TestSugarLogger_GetMessage_Multiple(t *testing.T) {
+func TestSugaredLogger_GetMessage_Multiple(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar()
@@ -257,7 +257,7 @@ func TestSugarLogger_GetMessage_Multiple(t *testing.T) {
 	assert.Contains(t, buf.String(), "msg1")
 }
 
-func TestSugarLogger_Log_Disabled(t *testing.T) {
+func TestSugaredLogger_Log_Disabled(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, &slog.HandlerOptions{Level: slog.LevelError}))
 	sugar := New(h).Sugar()
@@ -266,7 +266,7 @@ func TestSugarLogger_Log_Disabled(t *testing.T) {
 	assert.Empty(t, buf.String())
 }
 
-func TestSugarLogger_Named(t *testing.T) {
+func TestSugaredLogger_Named(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar().Named("myapp")
@@ -275,7 +275,7 @@ func TestSugarLogger_Named(t *testing.T) {
 	assert.Contains(t, buf.String(), "[myapp]")
 }
 
-func TestSugarLogger_Named_Empty(t *testing.T) {
+func TestSugaredLogger_Named_Empty(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar().Named("")
@@ -284,7 +284,7 @@ func TestSugarLogger_Named_Empty(t *testing.T) {
 	assert.NotContains(t, buf.String(), "[]")
 }
 
-func TestSugarLogger_Name(t *testing.T) {
+func TestSugaredLogger_Name(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar().Named("testname")
@@ -292,7 +292,7 @@ func TestSugarLogger_Name(t *testing.T) {
 	assert.Equal(t, "testname", sugar.Name())
 }
 
-func TestSugarLogger_Name_Empty(t *testing.T) {
+func TestSugaredLogger_Name_Empty(t *testing.T) {
 	buf := &bytes.Buffer{}
 	h := NewHandler(slog.NewJSONHandler(buf, nil))
 	sugar := New(h).Sugar()

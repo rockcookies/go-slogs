@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-// SugarLogger provides a more ergonomic API for logging with formatting support.
+// SugaredLogger provides a more ergonomic API for logging with formatting support.
 //
 // It wraps a Logger and offers both Sprint-style (concatenation) and Sprintf-style (formatting)
 // methods for each log level. This is similar to the Sugar logger in uber-go/zap.
@@ -20,158 +20,158 @@ import (
 //	sugar.Info("User logged in")                           // Sprint style
 //	sugar.Infof("User %s logged in from %s", user, ip)    // Sprintf style
 //	sugar.Info("User", user, "logged in from", ip)        // Sprint with multiple args
-type SugarLogger struct {
+type SugaredLogger struct {
 	base *Logger
 }
 
 // Handler returns the underlying Handler.
-func (l *SugarLogger) Handler() *Handler {
+func (l *SugaredLogger) Handler() *Handler {
 	return l.base.Handler()
 }
 
 // Enabled reports whether the logger emits log records at the given level.
-func (l *SugarLogger) Enabled(ctx context.Context, level slog.Level) bool {
+func (l *SugaredLogger) Enabled(ctx context.Context, level slog.Level) bool {
 	return l.base.Enabled(ctx, level)
 }
 
-// With returns a new SugarLogger with the given attributes added.
+// With returns a new SugaredLogger with the given attributes added.
 //
 // The arguments are converted to attributes using the same rules as Logger.Log.
-func (l *SugarLogger) With(args ...any) *SugarLogger {
-	return &SugarLogger{base: l.base.With(args...)}
+func (l *SugaredLogger) With(args ...any) *SugaredLogger {
+	return &SugaredLogger{base: l.base.With(args...)}
 }
 
-// WithGroup returns a new SugarLogger that starts a group.
+// WithGroup returns a new SugaredLogger that starts a group.
 //
 // All attributes added through the returned logger will be nested under the given group name.
-func (l *SugarLogger) WithGroup(name string) *SugarLogger {
-	return &SugarLogger{base: l.base.WithGroup(name)}
+func (l *SugaredLogger) WithGroup(name string) *SugaredLogger {
+	return &SugaredLogger{base: l.base.WithGroup(name)}
 }
 
-// WithOptions returns a new SugarLogger with the given options applied.
-func (l *SugarLogger) WithOptions(opts ...Option) *SugarLogger {
-	return &SugarLogger{base: l.base.WithOptions(opts...)}
+// WithOptions returns a new SugaredLogger with the given options applied.
+func (l *SugaredLogger) WithOptions(opts ...Option) *SugaredLogger {
+	return &SugaredLogger{base: l.base.WithOptions(opts...)}
 }
 
 // Desugar returns the underlying Logger.
 //
 // Use this when you need to access Logger-specific functionality or pass the logger
 // to code that expects a regular Logger.
-func (l *SugarLogger) Desugar() *Logger {
+func (l *SugaredLogger) Desugar() *Logger {
 	return l.base
 }
 
-// Named returns a new SugarLogger with the given name added to the logger's name chain.
-func (l *SugarLogger) Named(s string) *SugarLogger {
-	return &SugarLogger{base: l.base.Named(s)}
+// Named returns a new SugaredLogger with the given name added to the logger's name chain.
+func (l *SugaredLogger) Named(s string) *SugaredLogger {
+	return &SugaredLogger{base: l.base.Named(s)}
 }
 
 // Name returns the logger's name.
-func (l *SugarLogger) Name() string {
+func (l *SugaredLogger) Name() string {
 	return l.base.Name()
 }
 
 // Log logs at the given level. Uses Sprint to format the message.
-func (l *SugarLogger) Log(level slog.Level, args ...any) {
+func (l *SugaredLogger) Log(level slog.Level, args ...any) {
 	l.log(context.Background(), level, "", args)
 }
 
 // LogContext logs at the given level with the given context. Uses Sprint to format the message.
-func (l *SugarLogger) LogContext(ctx context.Context, level slog.Level, args ...any) {
+func (l *SugaredLogger) LogContext(ctx context.Context, level slog.Level, args ...any) {
 	l.log(ctx, level, "", args)
 }
 
 // Debug logs at LevelDebug. Uses Sprint to format the message.
-func (l *SugarLogger) Debug(args ...any) {
+func (l *SugaredLogger) Debug(args ...any) {
 	l.log(context.Background(), slog.LevelDebug, "", args)
 }
 
 // DebugContext logs at LevelDebug with the given context. Uses Sprint to format the message.
-func (l *SugarLogger) DebugContext(ctx context.Context, args ...any) {
+func (l *SugaredLogger) DebugContext(ctx context.Context, args ...any) {
 	l.log(ctx, slog.LevelDebug, "", args)
 }
 
 // Info logs at LevelInfo. Uses Sprint to format the message.
-func (l *SugarLogger) Info(args ...any) {
+func (l *SugaredLogger) Info(args ...any) {
 	l.log(context.Background(), slog.LevelInfo, "", args)
 }
 
 // InfoContext logs at LevelInfo with the given context. Uses Sprint to format the message.
-func (l *SugarLogger) InfoContext(ctx context.Context, args ...any) {
+func (l *SugaredLogger) InfoContext(ctx context.Context, args ...any) {
 	l.log(ctx, slog.LevelInfo, "", args)
 }
 
 // Warn logs at LevelWarn. Uses Sprint to format the message.
-func (l *SugarLogger) Warn(args ...any) {
+func (l *SugaredLogger) Warn(args ...any) {
 	l.log(context.Background(), slog.LevelWarn, "", args)
 }
 
 // WarnContext logs at LevelWarn with the given context. Uses Sprint to format the message.
-func (l *SugarLogger) WarnContext(ctx context.Context, args ...any) {
+func (l *SugaredLogger) WarnContext(ctx context.Context, args ...any) {
 	l.log(ctx, slog.LevelWarn, "", args)
 }
 
 // Error logs at LevelError. Uses Sprint to format the message.
-func (l *SugarLogger) Error(args ...any) {
+func (l *SugaredLogger) Error(args ...any) {
 	l.log(context.Background(), slog.LevelError, "", args)
 }
 
 // ErrorContext logs at LevelError with the given context. Uses Sprint to format the message.
-func (l *SugarLogger) ErrorContext(ctx context.Context, args ...any) {
+func (l *SugaredLogger) ErrorContext(ctx context.Context, args ...any) {
 	l.log(ctx, slog.LevelError, "", args)
 }
 
 // Logf logs at the given level. Uses Sprintf to format the message.
-func (l *SugarLogger) Logf(level slog.Level, template string, args ...any) {
+func (l *SugaredLogger) Logf(level slog.Level, template string, args ...any) {
 	l.log(context.Background(), level, template, args)
 }
 
 // LogfContext logs at the given level with the given context. Uses Sprintf to format the message.
-func (l *SugarLogger) LogfContext(ctx context.Context, level slog.Level, template string, args ...any) {
+func (l *SugaredLogger) LogfContext(ctx context.Context, level slog.Level, template string, args ...any) {
 	l.log(ctx, level, template, args)
 }
 
 // Debugf logs at LevelDebug. Uses Sprintf to format the message.
-func (l *SugarLogger) Debugf(template string, args ...any) {
+func (l *SugaredLogger) Debugf(template string, args ...any) {
 	l.log(context.Background(), slog.LevelDebug, template, args)
 }
 
 // DebugfContext logs at LevelDebug with the given context. Uses Sprintf to format the message.
-func (l *SugarLogger) DebugfContext(ctx context.Context, template string, args ...any) {
+func (l *SugaredLogger) DebugfContext(ctx context.Context, template string, args ...any) {
 	l.log(ctx, slog.LevelDebug, template, args)
 }
 
 // Infof logs at LevelInfo. Uses Sprintf to format the message.
-func (l *SugarLogger) Infof(template string, args ...any) {
+func (l *SugaredLogger) Infof(template string, args ...any) {
 	l.log(context.Background(), slog.LevelInfo, template, args)
 }
 
 // InfofContext logs at LevelInfo with the given context. Uses Sprintf to format the message.
-func (l *SugarLogger) InfofContext(ctx context.Context, template string, args ...any) {
+func (l *SugaredLogger) InfofContext(ctx context.Context, template string, args ...any) {
 	l.log(ctx, slog.LevelInfo, template, args)
 }
 
 // Warnf logs at LevelWarn. Uses Sprintf to format the message.
-func (l *SugarLogger) Warnf(template string, args ...any) {
+func (l *SugaredLogger) Warnf(template string, args ...any) {
 	l.log(context.Background(), slog.LevelWarn, template, args)
 }
 
 // WarnfContext logs at LevelWarn with the given context. Uses Sprintf to format the message.
-func (l *SugarLogger) WarnfContext(ctx context.Context, template string, args ...any) {
+func (l *SugaredLogger) WarnfContext(ctx context.Context, template string, args ...any) {
 	l.log(ctx, slog.LevelWarn, template, args)
 }
 
 // Errorf logs at LevelError. Uses Sprintf to format the message.
-func (l *SugarLogger) Errorf(template string, args ...any) {
+func (l *SugaredLogger) Errorf(template string, args ...any) {
 	l.log(context.Background(), slog.LevelError, template, args)
 }
 
 // ErrorfContext logs at LevelError with the given context. Uses Sprintf to format the message.
-func (l *SugarLogger) ErrorfContext(ctx context.Context, template string, args ...any) {
+func (l *SugaredLogger) ErrorfContext(ctx context.Context, template string, args ...any) {
 	l.log(ctx, slog.LevelError, template, args)
 }
 
-func (l *SugarLogger) log(ctx context.Context, level slog.Level, template string, fmtArgs []any) {
+func (l *SugaredLogger) log(ctx context.Context, level slog.Level, template string, fmtArgs []any) {
 	if ctx == nil {
 		ctx = context.Background()
 	}

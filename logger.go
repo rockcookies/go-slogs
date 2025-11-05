@@ -180,17 +180,17 @@ func (l *Logger) WithOptions(opts ...Option) *Logger {
 	return l2
 }
 
-// Sugar returns a SugarLogger that wraps this Logger.
+// Sugar returns a SugaredLogger that wraps this Logger.
 //
-// SugarLogger provides a more ergonomic API with Sprint-style and Sprintf-style methods.
+// SugaredLogger provides a more ergonomic API with Sprint-style and Sprintf-style methods.
 // Use Sugar when you need printf-style formatting or when you want a more concise API.
 //
 // Example:
 //
 //	sugar := logger.Sugar()
 //	sugar.Infof("User %s logged in from %s", username, ipAddr)
-func (l *Logger) Sugar() *SugarLogger {
-	return &SugarLogger{base: l}
+func (l *Logger) Sugar() *SugaredLogger {
+	return &SugaredLogger{base: l}
 }
 
 // Named returns a new Logger with the given name added to the logger's name chain.

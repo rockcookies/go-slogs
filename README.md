@@ -167,7 +167,7 @@ logger.Info("message", "key", "value")
 - `New(h slog.Handler, opts ...Option) *Logger`
 - `With(args ...any) *Logger`
 - `WithGroup(name string) *Logger`
-- `Sugar() *SugarLogger`
+- `Sugar() *SugaredLogger`
 - `Named(name string) *Logger`
 
 ### Context Functions
