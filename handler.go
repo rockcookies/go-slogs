@@ -22,9 +22,9 @@ type HandleFunc func(ctx context.Context, hc *HandlerContext, rt time.Time, rl s
 
 // HandlerOptions configures the behavior of a Handler.
 type HandlerOptions struct {
-	// handleFunc is the function that processes log records.
+	// HandleFunc is the function that processes log records.
 	// If nil, DefaultHandleFunc is used.
-	handleFunc HandleFunc
+	HandleFunc HandleFunc
 }
 
 // Handler is a middleware slog.Handler that manages attribute groups and context attributes.
@@ -112,7 +112,7 @@ func NewHandlerWithOptions(next slog.Handler, opts *HandlerOptions) *Handler {
 		opts = &HandlerOptions{}
 	}
 
-	handlerFunc := opts.handleFunc
+	handlerFunc := opts.HandleFunc
 	if handlerFunc == nil {
 		handlerFunc = DefaultHandleFunc
 	}

@@ -1,6 +1,9 @@
 package slogs
 
-import "log/slog"
+import (
+	"context"
+	"log/slog"
+)
 
 // Option configures a Logger.
 //
@@ -26,7 +29,25 @@ func (f optionFunc) apply(l *Logger) {
 //	logger := slogs.New(handler, slogs.WithCaller(false)) // Disable for performance
 func WithCaller(enabled bool) Option {
 	return optionFunc(func(l *Logger) {
-		l.addCaller = enabled
+		l.addCaller = func(_ context.Context, _ slog.Level) bool {
+			return enabled
+		}
+	})
+}
+
+func WithCallerAt(f func(ctx context.Context, level slog.Level) bool) Option {
+	return optionFunc(func(l *Logger) {
+		if f != nil {
+			l.addCaller = f
+		}
+	})
+}
+
+func WithCallerAtLevel(level slog.Level) Option {
+	return optionFunc(func(l *Logger) {
+		l.addCaller = func(_ context.Context, lvl slog.Level) bool {
+			return lvl >= level
+		}
 	})
 }
 

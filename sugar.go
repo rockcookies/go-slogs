@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"time"
 )
 
 // SugaredLogger provides a more ergonomic API for logging with formatting support.
@@ -181,8 +180,8 @@ func (l *SugaredLogger) log(ctx context.Context, level slog.Level, template stri
 	}
 
 	msg := getMessage(template, fmtArgs)
-	pc := l.base.capturePC()
-	r := slog.NewRecord(time.Now(), level, msg, pc)
+	pc := l.base.capturePC(ctx, level)
+	r := slog.NewRecord(l.base.clock.Now(), level, msg, pc)
 
 	_ = l.base.handler.Handle(ctx, r)
 }
