@@ -65,8 +65,8 @@ Create hierarchical loggers for better organization:
 
 ```go
 // Create named loggers
-dbLogger := slogs.New(handler, slogs.WithName("database"))
-apiLogger := slogs.New(handler, slogs.WithName("api"))
+dbLogger := slogs.New(handler).Named("database")
+apiLogger := slogs.New(handler).Named("api")
 
 // Nested naming
 poolLogger := dbLogger.Named("pool") // [database.pool]
@@ -91,7 +91,7 @@ Convenient formatted logging:
 sugar := logger.Sugar()
 sugar.Info("Simple message")
 sugar.Infof("Formatted %s", "message")
-sugar.Infow("With fields", "key", "value")
+sugar.Info("With fields", "key", "value")
 ```
 
 ### Standard Log Redirection
@@ -126,11 +126,12 @@ logger := slog.New(
 ## Configuration
 
 ```go
-logger := slogs.New(handler,
-    slogs.WithName("myapp"),
-    slogs.WithCaller(true),
-    slogs.WithLevel(slog.LevelInfo),
-)
+logger := slogs.New(handler).
+    Named("myapp").
+    WithOptions(
+        slogs.WithCaller(true),
+        slogs.WithLevel(slog.LevelInfo),
+    )
 
 // Custom handler processing
 options := &slogs.HandlerOptions{

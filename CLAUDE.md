@@ -115,16 +115,24 @@ codecov -f coverage.out
    - Reduces memory allocations for string operations
    - Used internally by stack trace formatting
 
-### Key Design Patterns
+9. **Clock Abstraction (`clock.go`)** - Time source abstraction for testing
+   - `Clock` interface with Now() and NewTicker() methods
+   - Default `systemClock` implementation using system time
+   - Enables time mocking in tests
+
+#### Key Design Patterns
 
 - **Middleware Pattern**: Handler wraps another handler for processing pipelines
 - **Linked List**: Attribute groups use linked list for efficient composition
 - **Interface Segregation**: Separate Logger and SugaredLogger interfaces
 - **Context Propagation**: Uses Go context for automatic attribute inclusion
+- **Object Pooling**: Stack traces and buffers use pooling to minimize allocations
+- **Immutable Pattern**: Logger and Handler derivation uses cloning to prevent race conditions
+- **Clock Abstraction**: Time source abstraction enables testable code
 
 ### Handler Flow
 
-1. Log record created by Logger with caller information and timestamp
+1. Log record created by Logger with caller information and timestamp using Clock
 2. Record attributes extracted and converted to `slog.Attr` slice
 3. `HandleFunc` processes attributes in this order:
    - Appends context attributes from `Append()` to the end
@@ -288,6 +296,33 @@ func TestNamedLogger(t *testing.T) {
 }
 ```
 
+## Architectural Principles
+
+### Design Philosophy
+
+The library follows several key architectural principles:
+
+1. **Standard Library Compatibility**: Drop-in replacement for `log/slog` - existing code works unchanged
+2. **Middleware-First**: Handler designed for composable processing pipelines
+3. **Performance Conscious**: Minimal allocations beyond standard slog, with pooling optimizations
+4. **Testability**: Clock abstraction and immutable patterns enable comprehensive testing
+5. **Context-First**: Leverages Go contexts for automatic attribute propagation
+6. **Type Safety**: Generic pool implementation and strong typing throughout
+
+### Memory Management
+
+- **Immutable Patterns**: Logger and Handler cloning prevents race conditions
+- **Object Pooling**: Stack traces and buffers reuse objects to minimize GC pressure
+- **Zero-Allocation Extraction**: Context attributes extracted with O(1) cost via type assertions
+- **Linked List Efficiency**: Attribute groups use linked lists for efficient composition
+
+### Concurrency Safety
+
+- **Race Condition Free**: All components designed for safe concurrent usage
+- **Immutable Context**: Context values are never mutated, only replaced
+- **Handler Cloning**: Deep copy mutable state when deriving handlers
+- **Atomic Operations**: Pool operations use atomic patterns for safety
+
 ## Integration Notes
 
 ### slog-multi Compatibility
@@ -391,6 +426,7 @@ go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 .
 ├── attr.go            # Stack trace attribute functions
 ├── attrs.go           # Attribute grouping linked list
+├── clock.go           # Clock abstraction for testing
 ├── context.go         # Context attribute management
 ├── handler.go         # Middleware handler implementation
 ├── logger.go          # Main Logger implementation
@@ -445,3 +481,26 @@ logger.Error("Handler error", slogs.StackSkip("stack", 2)) // skip 2 frames
 ```
 
 Stack trace capture is optimized with pooling to minimize performance impact.
+
+### Clock Abstraction and Testing
+
+The library provides a Clock abstraction for testable time-dependent code:
+
+```go
+// DefaultClock uses system time
+logger := slogs.New(handler)
+
+// For testing, you can create a mock clock
+type mockClock struct {
+    now time.Time
+}
+
+func (m *mockClock) Now() time.Time { return m.now }
+func (m *mockClock) NewTicker(d time.Duration) *time.Ticker {
+    return time.NewTicker(d) // or implement mock ticker
+}
+
+// Use in tests for deterministic timestamps
+mock := &mockClock{now: time.Unix(1234567890, 0)}
+// Inject mock clock into logger for consistent test results
+```
