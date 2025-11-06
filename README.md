@@ -73,7 +73,11 @@ func main() {
 Create hierarchical loggers for better organization:
 
 ```go
+// Create named loggers
 dbLogger := slogs.New(handler).Named("database")
+apiLogger := slogs.New(handler).Named("api")
+
+// Nested naming
 poolLogger := dbLogger.Named("pool") // [database.pool]
 ```
 
@@ -92,30 +96,9 @@ Convenient formatted logging:
 
 ```go
 sugar := logger.Sugar()
-sugar.Infof("User %s logged in", "alice")
-```
-
-### MultiHandler
-
-Broadcast log records to multiple handlers simultaneously:
-
-```go
-// Create multiple handlers
-h1 := slog.NewJSONHandler(os.Stdout, nil)      // JSON to stdout
-h2 := slog.NewTextHandler(os.Stderr, nil)      // Text to stderr
-fileHandler := slog.NewJSONHandler(file, nil)   // JSON to file
-
-// Combine with MultiHandler
-multi := slogs.MultiHandler(h1, h2, fileHandler)
-logger := slog.New(multi)
-
-// This log will be written to all three handlers
-logger.Info("Broadcast to multiple outputs")
-
-// MultiHandler properly handles:
-// - Nil handler filtering (nil handlers are automatically removed)
-// - Record isolation (each handler gets a cloned copy)
-// - Attribute independence (WithAttrs/WithGroup applied per handler)
+sugar.Info("Simple message")
+sugar.Infof("Formatted %s", "message")
+sugar.Info("With fields", "key", "value")
 ```
 
 ### Standard Log Redirection
@@ -197,3 +180,7 @@ go test -v -cover ./...
 ## License
 
 MIT License - see [LICENSE](LICENSE) file.
+
+## Contributing
+
+Issues and pull requests are welcome.
