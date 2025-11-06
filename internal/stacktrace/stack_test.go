@@ -16,7 +16,7 @@ func TestTake(t *testing.T) {
 	assert.Contains(
 		t,
 		lines[0],
-		"go.uber.org/zap/internal/stacktrace.TestTake",
+		"github.com/rockcookies/go-slogs/internal/stacktrace.TestTake",
 		"Expected stacktrace to start with the test.",
 	)
 }
@@ -51,7 +51,7 @@ func TestTakeWithSkipInnerFunc(t *testing.T) {
 func TestTakeDeepStack(t *testing.T) {
 	const (
 		N                  = 500
-		withStackDepthName = "go.uber.org/zap/internal/stacktrace.withStackDepth"
+		withStackDepthName = "github.com/rockcookies/go-slogs/internal/stacktrace.withStackDepth"
 	)
 	withStackDepth(N, func() {
 		trace := Take(0)

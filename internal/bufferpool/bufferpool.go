@@ -1,5 +1,3 @@
-// Package bufferpool houses zap's shared internal buffer pool. Third-party
-// packages can recreate the same functionality with buffers.NewPool.
 package bufferpool
 
 import "github.com/rockcookies/go-slogs/buffer"

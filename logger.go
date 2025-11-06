@@ -37,7 +37,6 @@ import (
 	"context"
 	"log/slog"
 	"runtime"
-	"time"
 
 	"github.com/rockcookies/go-slogs/internal/attr"
 )
@@ -53,8 +52,9 @@ import (
 // Create a Logger with New, or derive a new Logger from an existing one using With, WithGroup, or WithOptions.
 type Logger struct {
 	handler    *Handler
-	addCaller  bool
+	clock      Clock
 	callerSkip int
+	addCaller  func(ctx context.Context, level slog.Level) bool
 }
 
 // New creates a new Logger with the given Handler and options.
@@ -76,8 +76,9 @@ func New(h *Handler, options ...Option) *Logger {
 
 	l := &Logger{
 		handler:    h,
-		addCaller:  true,
+		clock:      DefaultClock,
 		callerSkip: 0,
+		addCaller:  func(_ context.Context, _ slog.Level) bool { return false },
 	}
 
 	for _, opt := range options {
@@ -285,9 +286,9 @@ func (l *Logger) ErrorContext(ctx context.Context, msg string, args ...any) {
 }
 
 // capturePC captures the program counter of the calling code for caller information.
-func (l *Logger) capturePC() uintptr {
+func (l *Logger) capturePC(ctx context.Context, level slog.Level) uintptr {
 	var pc uintptr
-	if l.addCaller {
+	if l.addCaller(ctx, level) {
 		var pcs [1]uintptr
 		// skip [runtime.Callers, this function, log function, this function's caller]
 		runtime.Callers(4+l.callerSkip, pcs[:])
@@ -306,8 +307,8 @@ func (l *Logger) log(ctx context.Context, level slog.Level, msg string, args ...
 		return
 	}
 
-	pc := l.capturePC()
-	r := slog.NewRecord(time.Now(), level, msg, pc)
+	pc := l.capturePC(ctx, level)
+	r := slog.NewRecord(l.clock.Now(), level, msg, pc)
 	r.AddAttrs(attr.ArgsToAttrSlice(args)...)
 
 	_ = l.handler.Handle(ctx, r)
@@ -323,8 +324,8 @@ func (l *Logger) logAttrs(ctx context.Context, level slog.Level, msg string, att
 		return
 	}
 
-	pc := l.capturePC()
-	r := slog.NewRecord(time.Now(), level, msg, pc)
+	pc := l.capturePC(ctx, level)
+	r := slog.NewRecord(l.clock.Now(), level, msg, pc)
 	r.AddAttrs(attrs...)
 
 	_ = l.Handler().Handle(ctx, r)
