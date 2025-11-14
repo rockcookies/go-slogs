@@ -101,6 +101,11 @@ func (l *Logger) Handler() *Handler {
 	return l.handler
 }
 
+// Normalize returns a standard slog.Logger that uses the same Handler.
+func (l *Logger) Normalize() *slog.Logger {
+	return slog.New(l.handler)
+}
+
 // With returns a new Logger that includes the given attributes in each output operation.
 //
 // The arguments are converted to attributes using the same rules as Logger.Log:
