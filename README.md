@@ -13,6 +13,7 @@ Enhanced structured logging for Go built on `log/slog` with middleware support, 
 - **Named Loggers**: Hierarchical logger naming for better organization
 - **Context Attributes**: Automatic attribute propagation via Go contexts
 - **Stack Trace Support**: Built-in stack trace attribute creation
+- **MultiHandler**: Broadcast logs to multiple handlers simultaneously
 - **Standard Log Redirect**: Redirect `log` package output to structured logging
 
 ## Installation
@@ -27,6 +28,7 @@ go get github.com/rockcookies/go-slogs
 package main
 
 import (
+    "context"
     "log/slog"
     "os"
     "github.com/rockcookies/go-slogs"
@@ -52,6 +54,13 @@ func main() {
     ctx := slogs.Prepend(context.Background(), "request_id", "123")
     logger.InfoContext(ctx, "Request processed")
 
+    // MultiHandler - broadcast to multiple handlers
+    h1 := slog.NewJSONHandler(os.Stdout, nil)
+    h2 := slog.NewTextHandler(os.Stderr, nil)
+    multi := slogs.MultiHandler(h1, h2)
+    logger := slog.New(multi)
+    logger.Info("This log will be output to both stdout and stderr")
+
     // Stack trace for debugging
     logger.Error("Something went wrong", slogs.Stack("stack"))
 }
@@ -64,11 +73,7 @@ func main() {
 Create hierarchical loggers for better organization:
 
 ```go
-// Create named loggers
 dbLogger := slogs.New(handler).Named("database")
-apiLogger := slogs.New(handler).Named("api")
-
-// Nested naming
 poolLogger := dbLogger.Named("pool") // [database.pool]
 ```
 
@@ -78,9 +83,7 @@ Propagate attributes through contexts:
 
 ```go
 ctx := slogs.Prepend(ctx, "request_id", "123")
-ctx = slogs.Append(ctx, "duration", "100ms")
 logger.InfoContext(ctx, "Request completed")
-// Output: {"request_id":"123","duration":"100ms","msg":"Request completed"}
 ```
 
 ### Sugar API
@@ -89,9 +92,30 @@ Convenient formatted logging:
 
 ```go
 sugar := logger.Sugar()
-sugar.Info("Simple message")
-sugar.Infof("Formatted %s", "message")
-sugar.Info("With fields", "key", "value")
+sugar.Infof("User %s logged in", "alice")
+```
+
+### MultiHandler
+
+Broadcast log records to multiple handlers simultaneously:
+
+```go
+// Create multiple handlers
+h1 := slog.NewJSONHandler(os.Stdout, nil)      // JSON to stdout
+h2 := slog.NewTextHandler(os.Stderr, nil)      // Text to stderr
+fileHandler := slog.NewJSONHandler(file, nil)   // JSON to file
+
+// Combine with MultiHandler
+multi := slogs.MultiHandler(h1, h2, fileHandler)
+logger := slog.New(multi)
+
+// This log will be written to all three handlers
+logger.Info("Broadcast to multiple outputs")
+
+// MultiHandler properly handles:
+// - Nil handler filtering (nil handlers are automatically removed)
+// - Record isolation (each handler gets a cloned copy)
+// - Attribute independence (WithAttrs/WithGroup applied per handler)
 ```
 
 ### Standard Log Redirection
@@ -106,21 +130,6 @@ if err != nil {
 defer restore()
 
 log.Print("This goes through slogs")
-```
-
-## Middleware Integration
-
-Use with slog-multi for handler pipelines:
-
-```go
-import slogmulti "github.com/samber/slog-multi"
-
-logger := slog.New(
-    slogmulti.Pipe(
-        slogs.NewMiddleware(&slogs.HandlerOptions{}),
-        // other middleware...
-    ).Handler(slog.NewJSONHandler(os.Stdout, nil)),
-)
 ```
 
 ## Configuration
@@ -145,27 +154,6 @@ options := &slogs.HandlerOptions{
 handler := slogs.NewHandlerWithOptions(baseHandler, options)
 ```
 
-## Migration from slog
-
-Replace existing slog usage with minimal changes:
-
-```go
-// Before
-logger := slog.New(handler)
-logger.Info("message", "key", "value")
-
-// After
-logger := slogs.New(slogs.NewHandler(handler))
-logger.Info("message", "key", "value")
-```
-
-## Performance
-
-- **Zero allocation** for attribute extraction from contexts
-- **Minimal overhead** compared to standard slog
-- **Caller info optional** - disable in performance-critical paths
-- **Use LogAttrs** when you already have `slog.Attr` values
-
 ## API Overview
 
 ### Core Methods
@@ -174,6 +162,7 @@ logger.Info("message", "key", "value")
 - `WithGroup(name string) *Logger`
 - `Sugar() *SugaredLogger`
 - `Named(name string) *Logger`
+- `MultiHandler(handlers ...slog.Handler) slog.Handler`
 
 ### Context Functions
 - `Prepend(ctx, args...) context.Context`
@@ -184,27 +173,12 @@ logger.Info("message", "key", "value")
 - `Stack(key string) slog.Attr`
 - `StackSkip(key string, skip int) slog.Attr`
 
-For detailed API documentation, see [GoDoc](https://pkg.go.dev/github.com/rockcookies/go-slogs).
+## Performance
 
-## Comparison with log/slog
-
-| Feature | log/slog | go-slogs |
-|---------|----------|----------|
-| Basic Logging | ✅ | ✅ |
-| Handler Middleware | ❌ | ✅ |
-| Sugar API | ❌ | ✅ |
-| Named Loggers | ❌ | ✅ |
-| Context Attributes | ❌ | ✅ |
-| Stack Trace Support | ❌ | ✅ |
-| Log Redirection | ❌ | ✅ |
-
-## Best Practices
-
-1. Use named loggers for module identification
-2. Leverage context for request-scoped attributes
-3. Choose Logger for simple cases, Sugar for formatting
-4. Use `LogAttrs` in performance-critical code
-5. Disable caller info in high-frequency logging paths
+- **Zero allocation** for attribute extraction from contexts
+- **Minimal overhead** compared to standard slog
+- **Caller info optional** - disable in performance-critical paths
+- **Use LogAttrs** when you already have `slog.Attr` values
 
 ## Testing
 
@@ -223,7 +197,3 @@ go test -v -cover ./...
 ## License
 
 MIT License - see [LICENSE](LICENSE) file.
-
-## Contributing
-
-Issues and pull requests are welcome.
