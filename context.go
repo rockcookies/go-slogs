@@ -35,7 +35,9 @@ func Prepend(parent context.Context, args ...any) context.Context {
 	}
 
 	if v, ok := parent.Value(prependKey{}).([]slog.Attr); ok {
-		// Clip to ensure this is a scoped copy
+		// Use slices.Clip to ensure we create a new slice with a separate backing array.
+		// This prevents accidental modifications to the original slice and avoids
+		// potential race conditions when the context is used across goroutines.
 		return context.WithValue(parent, prependKey{}, append(slices.Clip(v), attr.ArgsToAttrSlice(args)...))
 	}
 	return context.WithValue(parent, prependKey{}, attr.ArgsToAttrSlice(args))
@@ -75,7 +77,9 @@ func Append(parent context.Context, args ...any) context.Context {
 	}
 
 	if v, ok := parent.Value(appendKey{}).([]slog.Attr); ok {
-		// Clip to ensure this is a scoped copy
+		// Use slices.Clip to ensure we create a new slice with a separate backing array.
+		// This prevents accidental modifications to the original slice and avoids
+		// potential race conditions when the context is used across goroutines.
 		return context.WithValue(parent, appendKey{}, append(slices.Clip(v), attr.ArgsToAttrSlice(args)...))
 	}
 	return context.WithValue(parent, appendKey{}, attr.ArgsToAttrSlice(args))

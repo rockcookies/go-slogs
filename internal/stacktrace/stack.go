@@ -125,7 +125,7 @@ func Take(skip int) string {
 // Formatter formats a stack trace into a readable string representation.
 type Formatter struct {
 	b        *buffer.Buffer
-	nonEmpty bool // whehther we've written at least one frame already
+	nonEmpty bool // whether we've written at least one frame already
 }
 
 // NewFormatter builds a new Formatter.

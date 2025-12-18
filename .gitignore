@@ -10,6 +10,8 @@
 _obj
 _test
 
+.claude/settings.local.json
+
 # Architecture specific extensions/prefixes
 *.[568vq]
 [568vq].out
