@@ -23,7 +23,6 @@ jobs:
         uses: release-drafter/release-drafter@v6
         with:
           config-name: 'release-drafter.yml'
-          name: "Release ${{ github.ref_name }}"
           tag: ${{ github.ref_name }}
           publish: true
           prerelease: false
