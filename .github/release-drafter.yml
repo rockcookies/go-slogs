@@ -90,4 +90,4 @@ template: |
 
   $CONTRIBUTORS
 
-  **Full Changelog**: https://github.com/rockcookies/go-slogs/compare/$PREVIOUS_TAG...$INPUT_VERSION
+  **Full Changelog**: https://github.com/rockcookies/go-slogs/compare/$PREVIOUS_TAG...v$INPUT_VERSION
