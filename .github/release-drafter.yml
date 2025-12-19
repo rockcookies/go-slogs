@@ -3,6 +3,8 @@
 
 name-template: 'v$RESOLVED_VERSION'
 tag-template: 'v$RESOLVED_VERSION'
+exclude-labels:
+  - 'skip-changelog'
 categories:
   - title: '🚀 Features'
     labels:
@@ -47,8 +49,6 @@ categories:
 # Template for the release body
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 change-title-escapes: '\<*_&' # You can add # and @ to disable mentions
-# If you want to skip PRs that have this label
-skip-labels: 'skip-changelog'
 # Version extraction from commits
 version-resolver:
   major:
@@ -81,16 +81,13 @@ version-resolver:
   default: patch
 
 # Header and footer templates
-header: |
+template: |
   ## What's Changed
 
   $CHANGES
 
-footer: |
   ## Contributors
 
   $CONTRIBUTORS
 
-  ---
-
-  **Full Changelog**: https://github.com/rockcookies/go-slogs/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
+  **Full Changelog**: https://github.com/rockcookies/go-slogs/compare/$PREVIOUS_TAG...$NEXT_PATCH_VERSION
