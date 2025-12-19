@@ -47,15 +47,23 @@ func (h *testHandler) Handle(_ context.Context, r slog.Record) error {
 }
 
 func (h *testHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
-	newHandler := *h
-	newHandler.records = make([]slog.Record, 0)
-	return &newHandler
+	return &testHandler{
+		mu:      sync.Mutex{},
+		enabled: h.enabled,
+		records: make([]slog.Record, 0),
+		err:     h.err,
+		mutate:  h.mutate,
+	}
 }
 
 func (h *testHandler) WithGroup(_ string) slog.Handler {
-	newHandler := *h
-	newHandler.records = make([]slog.Record, 0)
-	return &newHandler
+	return &testHandler{
+		mu:      sync.Mutex{},
+		enabled: h.enabled,
+		records: make([]slog.Record, 0),
+		err:     h.err,
+		mutate:  h.mutate,
+	}
 }
 
 func (h *testHandler) recordCount() int {
